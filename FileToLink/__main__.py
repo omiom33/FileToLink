@@ -33,12 +33,16 @@ async def main(_, msg: Message):
     worker = AllWorkers.get(file_id=media.file_unique_id)
     if worker:
         # If the file already exist on the server
-        if not worker.parts[0]:
-            # If first part of the file is not downloaded yet, send Generating link message
-            gen_msg = await bot.send_message(msg.chat.id, Strings.generating_link,
-                                             reply_to_message_id=msg.message_id)
-        else:
-            gen_msg = None
+        gen_msg = (
+            None
+            if worker.parts[0]
+            else await bot.send_message(
+                msg.chat.id,
+                Strings.generating_link,
+                reply_to_message_id=msg.message_id,
+            )
+        )
+
     else:
         # Else if the file not exist on the server, Send the message to Archive Channel and Create empty file
         gen_msg = await bot.send_message(msg.chat.id, Strings.generating_link,
@@ -101,7 +105,7 @@ async def keep_awake(sleep_time=20 * 60):
     """
     while True:
         async with ClientSession() as session:
-            async with session.get(Config.Link_Root + "keep_awake"):
+            async with session.get(f"{Config.Link_Root}keep_awake"):
                 pass
         await sleep(sleep_time)
 
