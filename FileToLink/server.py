@@ -82,7 +82,10 @@ async def download(archive_id: int, name: str):
                                attachment_filename=worker.name)
     try:
         if request.range is not None and len(request.range.ranges) > 0:
-            await response.make_conditional(request.range, Config.Part_size if not worker.done else None)
+            await response.make_conditional(
+                request.range, None if worker.done else Config.Part_size
+            )
+
     except AssertionError:
         pass  # Bad Range Provided
     response.timeout = None

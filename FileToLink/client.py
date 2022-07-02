@@ -190,11 +190,7 @@ class TelegramClient(Client):
         else:
             media = message
 
-        if isinstance(media, str):
-            file_id_str = media
-        else:
-            file_id_str = media.file_id
-
+        file_id_str = media if isinstance(media, str) else media.file_id
         file_id_obj = FileId.decode(file_id_str)
 
         file_type = file_id_obj.file_type
@@ -226,11 +222,8 @@ class TelegramClient(Client):
             else:
                 extension = ".unknown"
 
-            file_name = "{}_{}{}".format(
-                FileType(file_id_obj.file_type).name.lower(),
-                media.file_unique_id,
-                extension
-            )
+            file_name = f"{FileType(file_id_obj.file_type).name.lower()}_{media.file_unique_id}{extension}"
+
 
         file_path = os.path.join(directory, file_name)
         if not os.path.isfile(file_path):
